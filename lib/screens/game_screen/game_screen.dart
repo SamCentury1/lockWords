@@ -1,14 +1,33 @@
 import 'dart:math';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:lock_words/ads/ad_mob_service.dart';
 import 'package:lock_words/functions/game_logic.dart';
 import 'package:lock_words/functions/helpers.dart';
+import 'package:lock_words/providers/ad_state.dart';
 import 'package:lock_words/providers/animation_state.dart';
+import 'package:lock_words/providers/color_palette.dart';
 import 'package:lock_words/providers/game_play_state.dart';
 import 'package:lock_words/providers/settings_state.dart';
-import 'package:lock_words/screens/game_screen/components/dial_widget.dart';
+import 'package:lock_words/resources/firestore_methods.dart';
+import 'package:lock_words/screens/game_screen/components/app_bar/app_bar.dart';
+import 'package:lock_words/screens/game_screen/components/cryptex/clue_summary_widget.dart';
+import 'package:lock_words/screens/game_screen/components/clues/clues_widget.dart';
+import 'package:lock_words/screens/game_screen/components/cryptex/cryptex_widget.dart';
+import 'package:lock_words/screens/game_screen/components/cryptex/dial_widget.dart';
+import 'package:lock_words/screens/game_screen/components/decorations/background.dart';
+import 'package:lock_words/screens/game_screen/components/decorations/coin_animation_painter.dart';
+import 'package:lock_words/screens/game_screen/components/decorations/coin_value_change_widget.dart';
+import 'package:lock_words/screens/game_screen/components/drawer/drawer_widget.dart';
+import 'package:lock_words/screens/game_screen/components/game_summary_overlay/game_summary_overlay_widget.dart';
+import 'package:lock_words/screens/game_screen/components/word_found_overlay/word_found_overlay_painter.dart';
+import 'package:lock_words/screens/game_screen/components/word_found_overlay/word_found_overlay_widget.dart';
+import 'package:lock_words/settings/settings.dart';
 import 'package:provider/provider.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -17,579 +36,385 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
+class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   late double horizontalDragValue = 0.0;
   late double localPosX = 0.0;
   late AnimationState animationState;
-  late AnimationController scrollBackController;
+  
+  // late ScrollController scrollCluesController;
+  late ItemScrollController itemScrollController;
 
-  // bool getIsDraggedOver(int index, double tileSize, double horizontalValue, double localX) {
-  //   late bool res = false;
-  //   double lowBound = index*(tileSize+5);
-  //   double upBound = 4*(tileSize+5);
-  //   if (horizontalValue >= 0 && localX >= lowBound && localX <= upBound) {
-  //     res = true;
-  //   }
-  //   return res;
-  // }
+  // late AnimationController colorController;
+  // late Animation<Color?> colorAnimation;
+  late bool lockPressed = false;
 
-  late double _screenWidth = 0.0;
+  late AnimationController _quarterTurnController;
+  late Animation<double> _quarterTurnAnimation;
+
+  late AnimationController _fullTurnController;
+  late Animation<double> _fullTurnAnimation;  
+
+  late AnimationController _foundWordOverlayController;
+  late Animation<double> _foundWordOverlayAnimation;  
+
+  // late AnimationController _foundWordProgressController;
+  late Animation<double> _foundWordProgressAnimation;
+
+  late AnimationController showClueController;
+  late AnimationController hideClueController;
+  // late AnimationController _flipClueCardInAngleController;
+  late Animation<double> showAngleAnimation;
+
+  // late AnimationController _flipClueCardOutAngleController;
+  late Animation<double> hideAngleAnimation;
+
+  // late AnimationController _flipClueCardInVisibilityController;
+  late Animation<double> showInVisibilityAnimation;
+  late Animation<double> showOutVisibilityAnimation;
+  // late AnimationController _flipClueCardOutVisibilityController;
+  late Animation<double> hideInVisibilityAnimation;
+  late Animation<double> hideOutVisibilityAnimation;
+
+  late Animation<double> showProgressAnimation;
+  late Animation<double> hideProgressAnimation;
+
+  late AnimationController coinProgressController;
+  // late Animation<double> coinProgressAnimation;
+
+  late Animation<double> overlayWordGlowAnimation;
+
+  // WHEN A HINT IS CHARGED
+  late Animation<double> hintChargePositionAnimation;
+  late Animation<double> hintChargeVisibilityAnimation;
+
+    
+
+  late List<Offset> sparks = [];
+  // late List<Map<String,dynamic>> sparks2 = [];
+
+  late Map<dynamic,dynamic> coinAnimationOffsets = {};
+  late Map<dynamic,dynamic> pathData = {}; 
+
+  // RewardedAd? _rewardedAd;
+  late AdState _adState;
+  // late GamePlayState _gamePlayState;
+
+
+
+  
+  // late double _screenWidth = 0.0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
 
-      final GamePlayState gamePlayState = Provider.of<GamePlayState>(context, listen: false);
-      final SettingsState settingsState = Provider.of<SettingsState>(context, listen: false);    
+    _adState = Provider.of<AdState>(context, listen: false);
 
-      final screenwidth = MediaQuery.of(context).size.width;
-      final screenHeight = MediaQuery.of(context).size.height;
-
-      final AppBar appBar = AppBar();
-      late double appBarHeight = appBar.preferredSize.height;
-
-      final playScreenHeight = MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - appBarHeight;
-      
-      _screenWidth = screenwidth;
-
-      final double playAreaHeight = screenHeight;
-      final double playAreaWidth = screenwidth > 600.0 ? 600.0 : screenwidth;
-      final double minTileSize = playAreaHeight / 9;
-      final double maxTileSize = (playAreaWidth * 0.95) / 6;
-      late double tileSize = 0.0;
-
-      if (minTileSize > maxTileSize) {
-        tileSize = maxTileSize;
-      } else {
-        tileSize = minTileSize;
-      }
-      gamePlayState.setTileSize(tileSize);         
-      
-      
-      print("tileSize: ${tileSize}");
-      print("lock widget height: ${tileSize*3}");
-      print("total game play height = ${playScreenHeight} ");
-      print("the lock widget takes up ${(((tileSize*3)/playScreenHeight)*100).round()}% of the height");
-      double lockWidgetShare = (((tileSize*4)/playScreenHeight));
-      double lockWidgetHeight = lockWidgetShare*playScreenHeight;
-      print("which is ${(playScreenHeight*0.69)/tileSize} tiles");
-
-      double topWidgetShare = (tileSize/playAreaHeight);
-      double topWidgetHeight = topWidgetShare*playAreaHeight;
-      double gap = 0.1;
-      double cluesWidgetShare = (1-topWidgetShare-lockWidgetShare-gap); 
-      double cluesWidgetHeight = cluesWidgetShare*playAreaHeight; 
-
-
-      settingsState.setScreenSizeData({
-        "width": screenwidth, 
-        "height": screenHeight,
-        "lockWidgetHeight": lockWidgetHeight,
-        "cluesWidgetHeight": cluesWidgetHeight,
-        "topWidgetHeight":topWidgetHeight,            
-      });
-    });
-
-
-    animationState = Provider.of<AnimationState>(context,listen: false);
 
     initializeAnimations();
-    animationState.addListener(handleAnimationStateChange);
 
+    animationState = Provider.of<AnimationState>(context,listen: false);
+    animationState.addListener(handleAnimationStateChanges);
+    itemScrollController = ItemScrollController();
+
+
+    // _createRewardedAd();
+    _adState.createRewardedAd();
   }
+
 
   void initializeAnimations() {
 
-    scrollBackController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
+      _quarterTurnController = AnimationController(
+        duration: const Duration(milliseconds: 300),
+        vsync: this,
+      );
 
-  }
-
-  void handleAnimationStateChange() {
-    if (animationState.shouldRunScrollBackAnimation) {
-      executeScrollBackAnimation();
-    }
-  }
-
-  void executeScrollBackAnimation() {
-    scrollBackController.reset();
-    scrollBackController.forward();
-  }
-
-  
-  late bool showClues = false;
-
-  String hashWord(GamePlayState gamePlayState, int index) {
-    Map<int,dynamic> foundLetters = Helpers().getUnHashedLetters(gamePlayState);
-
-    Map<String,dynamic> wordData = gamePlayState.words[index];
-    String res = wordData["word"];
-    if (wordData["active"]) {
-      String bb = "";
-      List<String> letters = wordData["word"].split("");
-      for (int i = 0; i<letters.length; i++) {
-        List<dynamic> wheel = foundLetters[i];
-        if (wheel.contains(letters[i])) {
-          bb = bb + "${letters[i]} ";
-        } else {
-          bb = bb + "- ";
-        }
-      }
-      res = bb;
-    }
-    return res;
-  }
-
-  double getSwipeOpacity(GamePlayState gamePlayState, int key) {
-    double res = 0.0;
-    List<double> path = gamePlayState.clueSwipePath;
-    
-    if (path.isEmpty) {
-      res = 0.0;
-    } else {
-      if (gamePlayState.swipedClueStartId == key) {
-        double denominator = gamePlayState.tileSize*5;
-        double numerator = (path[0] - path[path.length-1]);
-        // if ((numerator/denominator) )
-        res = (numerator/denominator).abs();
-      }
-    }
-    return res;
-  }
-  List<Color> getColors(double opacity) {
-    List<Color> res = [
-      Colors.transparent,
-      Colors.transparent,
-    ];
-    if (opacity != 0.0) {
-      res = [
-        Color.fromRGBO(231, 147, 141, opacity),
-        Colors.transparent,        
+      List<TweenSequenceItem<double>> _quarterTurnAnimationSequence = [
+        TweenSequenceItem(tween: Tween(begin: 0.0, end: 90,), weight: 50),
+        TweenSequenceItem(tween: Tween(begin: 90.0, end: 0.0,), weight: 50),
       ];
+
+      _quarterTurnAnimation  = TweenSequence<double>(_quarterTurnAnimationSequence).animate(_quarterTurnController);
+
+      _fullTurnController = AnimationController(
+        duration: const Duration(milliseconds: 500),
+        vsync: this,
+      );
+
+      List<TweenSequenceItem<double>> _fullTurnAnimationSequence = [
+        TweenSequenceItem(tween: Tween(begin: 0.00, end: 360.00,), weight: 100),
+        // TweenSequenceItem(tween: Tween(begin: 0.00, end: 0.00,), weight: 1),
+      ];      
+
+      _fullTurnAnimation  = TweenSequence<double>(_fullTurnAnimationSequence).animate(_fullTurnController);
+
+
+      _foundWordOverlayController = AnimationController(
+        duration: const Duration(milliseconds: 3000),
+        vsync: this,
+      );
+
+      List<TweenSequenceItem<double>> foundWordOverlayAnimationSequence = [
+        TweenSequenceItem(tween: Tween(begin: 0.00, end: 1.00,), weight: 10),
+        TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00,), weight: 80),
+        TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.00,), weight: 10),
+      ];      
+
+      _foundWordOverlayAnimation  = TweenSequence<double>(foundWordOverlayAnimationSequence).animate(_foundWordOverlayController); 
+
+      List<TweenSequenceItem<double>> overlayWordGlowAnimationSequence = [
+        TweenSequenceItem(tween: Tween(begin: 0.00, end: 1.00,), weight: 10),
+        TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.50,), weight: 10),
+        TweenSequenceItem(tween: Tween(begin: 0.50, end: 1.00,), weight: 10),
+        TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.50,), weight: 10),
+        TweenSequenceItem(tween: Tween(begin: 0.50, end: 1.00,), weight: 10), 
+        TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.00,), weight: 50),
+      ];      
+
+      overlayWordGlowAnimation  = TweenSequence<double>(overlayWordGlowAnimationSequence).animate(_foundWordOverlayController);            
+
+      List<TweenSequenceItem<double>> foundWordProgressAnimationSequence = [
+        TweenSequenceItem(tween: Tween(begin: 0.00, end: (600)-1), weight: 100),
+      ];      
+
+      _foundWordProgressAnimation  = TweenSequence<double>(foundWordProgressAnimationSequence).animate(_foundWordOverlayController);      
+
+    /// ========= SHOW ===================
+    showClueController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    showProgressAnimation =Tween<double>(begin: 0.00, end: 1.0).animate(showClueController);  
+
+    CurvedAnimation showCurvedAnimation = CurvedAnimation(parent: showClueController, curve: Curves.linear);
+    showAngleAnimation  = Tween<double>(begin: 0.00, end: 180.0).animate(showCurvedAnimation);  
+
+    List<TweenSequenceItem<double>> showInVisibilitySequence = [
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 0.00), weight: 55),
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 1.00), weight: 05),
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 40),
+    ];      
+    showInVisibilityAnimation  = TweenSequence<double>(showInVisibilitySequence).animate(showClueController);
+
+    List<TweenSequenceItem<double>> showOutVisibilitySequence = [
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.00), weight: 05),
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 0.00), weight: 55),
+    ];      
+    showOutVisibilityAnimation  = TweenSequence<double>(showOutVisibilitySequence).animate(showClueController);    
+
+    /// ========= HIDE ===================
+    hideClueController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    hideProgressAnimation =Tween<double>(begin: 1.00, end: 0.00).animate(hideClueController);  
+    List<TweenSequenceItem<double>> hideAngleSequence = [
+      TweenSequenceItem(tween: Tween(begin: 180.00, end: 0.0), weight: 10),
+    ];
+    // CurvedAnimation hideCurvedAnimation = CurvedAnimation(parent: showClueController, curve: Curves.easeIn);
+
+    hideAngleAnimation  = TweenSequence<double>(hideAngleSequence).animate(hideClueController);   
+
+    List<TweenSequenceItem<double>> hideInVisibilitySequence = [
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.00), weight: 05),
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 0.00), weight: 55),
+  
+    ];      
+    hideInVisibilityAnimation  = TweenSequence<double>(hideInVisibilitySequence).animate(hideClueController);
+
+    List<TweenSequenceItem<double>> hideOutVisibilitySequence = [
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 0.00), weight: 55),
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 1.00), weight: 05),
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 40),
+  
+    ];      
+    hideOutVisibilityAnimation  = TweenSequence<double>(hideOutVisibilitySequence).animate(hideClueController);
+
+
+    coinProgressController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );     
+    hintChargePositionAnimation =Tween<double>(begin: 0.0, end: 1.0).animate(coinProgressController);
+
+    List<TweenSequenceItem<double>> hintChargeVisibilitySequence = [
+      TweenSequenceItem(tween: Tween(begin: 0.00, end: 1.00), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.00), weight: 30),
+    ];     
+    hintChargeVisibilityAnimation = TweenSequence<double>(hintChargeVisibilitySequence).animate(coinProgressController);
+  }
+
+  void handleAnimationStateChanges() {
+    if (animationState.shouldRunWordFoundAnimation) {
+      executeFoundWordAnimation();
     }
-    return res;
+
+    if (animationState.shouldRunLockQuarterTurn) {
+      executeQuarterTurnAnimation();
+    }
+
+    if (animationState.shouldRunShowHintAnimation) {
+      executeShowClueAnimation();
+    }
+
+    if (animationState.shouldRunHideHintAnimation) {
+      executeHideClueAnimation();
+    }
+
+    if (animationState.shouldRunCoinAnimation) {
+      executeCoinAnimation();
+
+    }
   }
 
-  List<Widget> getCluesList(GamePlayState gamePlayState) {
-    List<Widget> clues = [];
-    gamePlayState.words.forEach((key,value) {
-      Widget widget = GestureDetector(
-        onHorizontalDragStart: (details) {
-          // print("starting to swipe $value");
-          // print(details.localPosition.dx);
-          gamePlayState.setSwipedClueStartId(key);
-          gamePlayState.setClueSwipePath([...gamePlayState.clueSwipePath,details.localPosition.dx]);
-        },
-        onHorizontalDragUpdate: (details) {
-          double dx = details.localPosition.dx;
-          if (!gamePlayState.clueSwipePath.contains(dx)) {
-            gamePlayState.setClueSwipePath([...gamePlayState.clueSwipePath,dx]);
-          }
-        },
-        onHorizontalDragEnd: (details) {
-          print("finishing swipe of clue $value");
-          GameLogic().validateGuess(gamePlayState, value);
-          gamePlayState.setClueSwipePath([]);
-          gamePlayState.setSwipedClueStartId(null);
-        },
-
-        onHorizontalDragCancel: () {
-          gamePlayState.setClueSwipePath([]);
-          gamePlayState.setSwipedClueStartId(null);
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: getColors(getSwipeOpacity(gamePlayState, key))
-            )
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: gamePlayState.tileSize*0.45,
-                child: Center(
-                  child: Text(
-                    "${(key+1)}.",
-                    style: TextStyle(
-                      fontSize: gamePlayState.tileSize*0.25
-                    ),
-                  )
-                ),
-              ),
-              Container(
-                width: gamePlayState.tileSize,
-                child: Center(
-                  child: Text(
-                    // value['word']
-                    hashWord(gamePlayState,key),
-                    style: TextStyle(
-                      fontSize: gamePlayState.tileSize*0.25
-                    ),                    
-          
-                  ),
-                ),
-              ),
-              SizedBox(width: 5.0,),
-              Flexible(
-                child: Container(
-                  child: Text(
-                    value["clue"],
-                    style: TextStyle(
-                      decoration: value["active"] ? TextDecoration.none : TextDecoration.lineThrough,
-                      fontSize: gamePlayState.tileSize*0.25
-                    ),
-                    // overflow: TextOverflow.clip,
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      );
-      Widget divider = Divider(
-        thickness:1.0,
-        color: Colors.grey,
-      );
-
-      clues.add(widget);
-      clues.add(divider);
-    });
-    return clues;
+  void executeShowClueAnimation() {
+    showClueController.reset();
+    showClueController.forward();
   }
 
+  void executeHideClueAnimation() {
+    hideClueController.reset();
+    hideClueController.forward();
+  }  
 
-  // List<Widget> getWordKeys(GamePlayState gamePlayState) {
-  //   List<Widget> items = [];
-  //   gamePlayState.words.forEach((key,value) {
-  //     Widget widget = Container(
-  //       width: gamePlayState.tileSize*0.65,
-  //       height: gamePlayState.tileSize*0.65,
-  //       child: Center(
-  //         child: Container(
-  //           width: gamePlayState.tileSize*0.6,
-  //           height: gamePlayState.tileSize*0.6,
-  //           decoration: BoxDecoration(
-  //             color: value["active"] ? Colors.blue : Colors.orange,
-  //             borderRadius: BorderRadius.circular(100.0)
-  //           ),
-  //           child: Draggable(
-  //             data: value,
-  //             feedback: Container(
-  //               width: gamePlayState.tileSize*0.5,
-  //               height: gamePlayState.tileSize*0.5,
-  //               color: Colors.purple,
-  //             ),
-  //             childWhenDragging: Container(
-  //               width: gamePlayState.tileSize*0.5,
-  //               height: gamePlayState.tileSize*0.5,
-  //               color: Colors.green,
-  //             ),
-  //             // onDragUpdate: (details) {
-  //             //   print(details);
-  //             // },
-  //             child: Center(
-  //               child: Text(
-  //                 (key+1).toString(),
-  //                 style: TextStyle(
-  //                   fontSize: gamePlayState.tileSize*0.25,
-  //                   color: Colors.black
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //           // child: Center(
-  //           //   child: Text(
-  //           //     (key+1).toString(),
-  //           //     style: TextStyle(
-  //           //       fontSize: gamePlayState.tileSize*0.25,
-  //           //       color: Colors.black
-  //           //     ),
-  //           //   ),
-  //           // ),
-  //         ),
-  //       ),
-  //     );
-  //     items.add(widget);
-  //   });
 
-  //   return items;
-  // }
+  void executeFoundWordAnimation() {
+    print("execute word found animation");
+    _foundWordOverlayController.reset();
+    _foundWordOverlayController.forward();
+    _fullTurnController.reset();
+    _fullTurnController.forward();    
+  }
+
+  void executeQuarterTurnAnimation() {
+    _quarterTurnController.reset();
+    _quarterTurnController.forward();
+  }
+
+  void executeCoinAnimation() {
+    coinProgressController.reset();
+    coinProgressController.forward();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GamePlayState>(
-      builder: (context,gamePlayState,child) {
-        Helpers().getUnHashedLetters(gamePlayState);
-        late AnimationState _animationState = Provider.of<AnimationState>(context, listen: false);
-        late SettingsState settingsState = Provider.of<SettingsState>(context, listen: false);
-        double ts = gamePlayState.tileSize;
-        return Stack(
-          children: [
-            Container(
-              width: settingsState.screenSizeData["width"],
-              height: settingsState.screenSizeData["height"],
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topRight,
-                  colors: [
-                    Color.fromARGB(255, 202, 149, 211),
-                    Colors.white,
-                    Color.fromARGB(255, 253, 245, 170),
-                  ]
-                )
-              ),
-            ),
-            Positioned(
-              top: gamePlayState.tileSize*2,
-              left: gamePlayState.tileSize*2,
-              child: Container(
-                width: gamePlayState.tileSize,
-                height: gamePlayState.tileSize,
-                color: Colors.orange.withOpacity(0.5)
-              )
-            ),
-  
-            Positioned(
-              top: gamePlayState.tileSize*4,
-              left: gamePlayState.tileSize*3,
-              child: Container(
-                width: gamePlayState.tileSize,
-                height: gamePlayState.tileSize,
-                color: Colors.orange.withOpacity(0.5)
-              )
-            ),
+    return Consumer<AnimationState>(
+      builder: (context,_animationState,child) {
+        return Consumer<GamePlayState>(
+          builder: (context,gamePlayState,child) {
+            Helpers().getUnHashedLetters(gamePlayState);
+            late SettingsState settingsState = Provider.of<SettingsState>(context, listen: false);
+            late ColorPalette palette = Provider.of<ColorPalette>(context, listen: false);
+            late Map<String,AnimationController> hintControllers = {"show": showClueController, "hide": hideClueController};
+            final Map<String,dynamic> hintAnimations = {
+              "show": {
+                "angle": showAngleAnimation,
+                "inVisibility": showInVisibilityAnimation,
+                "outVisibility": showOutVisibilityAnimation,
+                "progress": showProgressAnimation,
+              },
+              "hide": {
+                "angle": hideAngleAnimation,
+                "inVisibility": hideInVisibilityAnimation,
+                "outVisibility": hideOutVisibilityAnimation,
+                "progress": hideProgressAnimation
+              }
+            };
 
-            Positioned(
-              top: gamePlayState.tileSize*3,
-              left: gamePlayState.tileSize*5,
-              child: Container(
-                width: gamePlayState.tileSize,
-                height: gamePlayState.tileSize,
-                color: Colors.orange.withOpacity(0.5)
-              )
-            ),                        
-            Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                actions: [
-                  PopupMenuButton<int>(
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        child: Text("Main Menu"),
-                        onTap: () {
-                          // Helpers().navigateToMainMenu(context);
-                          print("menu");
-                        },
-                      ),
-                      PopupMenuItem(
-                        child: Text("Restart"),
-                        onTap: () {
-                          print("restart");
-                        },
-                      ),
-                    ]
-                  )                  
-                ],
-              ),
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
+            
 
-                    Container(
-                      width: gamePlayState.tileSize*5.5,
-                      height: settingsState.screenSizeData["topWidgetHeight"],
-                      color: Colors.blue,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            width: gamePlayState.tileSize,
-                            height: gamePlayState.tileSize*0.7,
-                            color: Colors.blue,
-                          ),
-                          Container(
-                            width: gamePlayState.tileSize,
-                            height: gamePlayState.tileSize*0.7,
-                            color: Colors.blue,
-                          ),                          
-                        ],
-                      )
-                    ),                    
-                    
-                    // Container(
-                    //   width: gamePlayState.tileSize*5.5,
-                    //   height: gamePlayState.tileSize*0.7,
-                    //   child: Center(
-                    //     child: Text(
-                    //       "Clues",
-                    //       style: TextStyle(
-                    //         fontSize: gamePlayState.tileSize*0.5,
-                    //         color: Colors.black
-                    //       )
-                    //     )
-                    //   ),
-                    // ),
-              
-                    Stack(
-                      children: [
-                        // Container(
-                        //   width: gamePlayState.tileSize*5.5,
-                        //   height: gamePlayState.tileSize*6,
-                        //   // color: Colors.blue,
-                        //   child: BackdropFilter(
-                        //     filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        //     child: Container(
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.all(Radius.circular(ts*0.2)),
-                        //         color: const Color.fromARGB(255, 219, 217, 217).withOpacity(0.5),
-                        //       ),
-                        //     ),
-                        //   ),                          
-                        // ),
-                        Container(
-                          width: gamePlayState.tileSize*5.5,
-                          height: settingsState.screenSizeData["cluesWidgetHeight"],
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(118, 223, 222, 222),
-                            borderRadius: BorderRadius.all(Radius.circular(ts*0.2))
-                        
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: getCluesList(gamePlayState)
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // SizedBox(height: gamePlayState.tileSize*0.25,),
-                    Container(
-                      width: gamePlayState.tileSize*5.5,
-                      height: settingsState.screenSizeData["lockWidgetHeight"],
-                      color: Colors.blue,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,                      
-                        children: [
-                          Container(
-                            width: gamePlayState.tileSize*5.5,
-                            height: settingsState.screenSizeData["lockWidgetHeight"]*0.8,
-                            decoration: BoxDecoration(
-                              // border: Border.all(color: Colors.black, width: ts*0.01),
-                              borderRadius: BorderRadius.all(Radius.circular(ts*0.15)),
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  const Color.fromARGB(255, 73, 73, 73),
-                                  Color.fromARGB(255, 50, 50, 51)
-                                ]
-                              )
-                            ),
-                            child: Center(
-                              child: Container(
-                                width: gamePlayState.tileSize*5,
-                                child: GestureDetector(
-                                  onPanStart:(details) {
-                                    double wheel = (details.localPosition.dx / gamePlayState.tileSize);
-                                    double leftOver = (details.localPosition.dx % gamePlayState.tileSize)/gamePlayState.tileSize;
-                                    int? index = (wheel - leftOver).round();
-                                    gamePlayState.setDragStartWheelId(index);
-                                  },
-                                
-                                  onPanUpdate: (details) {
-                                    if (gamePlayState.dragStartWheelId != null) {
-                                      late Offset coords = Offset(details.localPosition.dx,details.localPosition.dy);
-                                      late List<Offset> currentPath = gamePlayState.dragPath;
-                                      gamePlayState.setDragPath([...currentPath,coords]);
-                                      late Offset firstCoords = gamePlayState.dragPath[0];
-                                
-                                      late double yDistance = (firstCoords.dy - coords.dy);
-                                
-                                      if (yDistance >= gamePlayState.tileSize) {
-                                        GameLogic().executeMoveUp(gamePlayState);
-                                        gamePlayState.setDragStartWheelId(null);
-                                        gamePlayState.setDragPath([]);
-                                      } 
-                                
-                                      if (yDistance <= (gamePlayState.tileSize*-1) ) {
-                                        GameLogic().executeMoveDown(gamePlayState);
-                                        gamePlayState.setDragStartWheelId(null);
-                                        gamePlayState.setDragPath([]);
-                                      }                       
-                                    }
-                                  },
-                                
-                                  onPanEnd: (details) {
-                                    late Offset coords = Offset(details.localPosition.dx,details.localPosition.dy);
-                                    late List<Offset> currentPath = gamePlayState.dragPath;
-                                    gamePlayState.setDragPath([...currentPath,coords]);
-                                    late Offset firstCoords = gamePlayState.dragPath[0];
-                                
-                                    late double yDistance = (firstCoords.dy - coords.dy);
-                                    if (yDistance >0 && yDistance <= gamePlayState.tileSize) {
-                                      print("tried to swipe up but didn't quite make it");
-                                      _animationState.setShouldRunScrollBackAnimation(true);
-                                
-                                
-                                    } 
-                                
-                                
-                                    if (yDistance<0 && yDistance >= (gamePlayState.tileSize*-1) ) {
-                                      print("tried to swipe down but didn't quite make it");
-                                      _animationState.setShouldRunScrollBackAnimation(true);
-                                      
-                                    }                        
-                                
-                                
-                                
-                                    Future.delayed(const Duration(milliseconds: 200), () {
-                                      _animationState.setShouldRunScrollBackAnimation(false);
-                                      gamePlayState.setDragStartWheelId(null);
-                                      gamePlayState.setDragPath([]);
-                                    });
-                                
-                                  },
-                                
-                                  child: Row(
-                                    children: [
-                                      DialWidget(index: 0, scrollBackController: scrollBackController,),
-                                      DialWidget(index: 1, scrollBackController: scrollBackController,),
-                                      DialWidget(index: 2, scrollBackController: scrollBackController,),
-                                      DialWidget(index: 3, scrollBackController: scrollBackController,),
-                                      DialWidget(index: 4, scrollBackController: scrollBackController,),                                                    
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+            return Stack(
+              children: [
+                SizedBox(
+                  width: settingsState.screenSizeData["width"],
+                  height: settingsState.screenSizeData["height"],
+                  child: CustomPaint(painter: Background(palette: palette),),
                 ),
-              ),
-            ),
-          ],
+                Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: PreferredSize(
+                    preferredSize: ui.Size(MediaQuery.of(context).size.width, 40.0),
+                    child: const AppBarWidget(),
+                  ),
+
+
+                  drawer: const DrawerWidget(),
+                  body: Stack(
+                    children: [
+
+
+                      CluesWidget(
+                        itemScrollController: itemScrollController,
+                        hintControllers: hintControllers,
+                        hintAnimations: hintAnimations, 
+                      ),
+
+                      CryptexWidget(
+                        itemScrollController: itemScrollController, 
+                        foundWordController: _foundWordOverlayController,
+                        quarterTurnController: _quarterTurnController,
+                        quarterTurnAnimation: _quarterTurnAnimation, 
+                        fullTurnAnimation: _fullTurnAnimation
+                      )
+                    ],
+                  ),
+                ),
+
+                WordFoundOverlayWidget(
+                  foundWordController: _foundWordOverlayController, 
+                  foundWordOverlayAnimation: _foundWordOverlayAnimation, 
+                  foundWordProgressAnimation: _foundWordProgressAnimation, 
+                  overlayWordGlowAnimation: overlayWordGlowAnimation,
+                ),
+
+                AnimatedBuilder(
+                  animation: coinProgressController,
+                  builder: (context, child) {
+                    late double itemWidth = 40;
+                    late double itemHeight = 40;
+
+                    if (animationState.shouldRunCoinAnimation && gamePlayState.clueTappedPosition != null) {
+                      double top = gamePlayState.clueTappedPosition!.dy - (itemHeight/2) - (hintChargePositionAnimation.value * (itemHeight*2));
+                      double left = gamePlayState.clueTappedPosition!.dx - (itemWidth/2); 
+                      return Positioned(
+                        top: top,
+                        left: left,
+                        child: Container(
+                          width: itemWidth,
+                          height: itemHeight,
+                          child: DefaultTextStyle(
+                            style: TextStyle(
+                              fontSize: 28,
+                              color: palette.mainTextColor.withOpacity(hintChargeVisibilityAnimation.value),
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 5.0,
+                                  offset: Offset.zero,
+                                  color: palette.mainTextColor
+                                )
+                              ]
+                            ),
+                            child: Text("-10"),
+                          ),
+                          // color: Colors.red.withOpacity(hintChargeVisibilityAnimation.value),
+                        ),
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  }
+                ),
+                const GameSummaryOverlayWidget()                
+              ],
+            );
+          }
         );
       }
     );
   }
 }
-
-

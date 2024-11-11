@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "530495360476",
+    "project_id": "cryptext-7c891",
+    "storage_bucket": "cryptext-7c891.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530495360476:android:47ae426952ce01cd279319",
+        "android_client_info": {
+          "package_name": "com.nodamngoodstudios.cryptext"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "530495360476-7ph53r6ic6n2na9m3f7j2u1mrgthnltm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU-CQuMwUXiWR18J50i5r83r99mIIOEKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "530495360476-7ph53r6ic6n2na9m3f7j2u1mrgthnltm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.lockWords"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

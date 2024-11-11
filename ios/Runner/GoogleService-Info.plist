@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAukiHZjyM_RDOWP9uBUpYVmWuevvkyXLI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>530495360476</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.lockWords</string>
+	<key>PROJECT_ID</key>
+	<string>cryptext-7c891</string>
+	<key>STORAGE_BUCKET</key>
+	<string>cryptext-7c891.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:530495360476:ios:e10219f616b4ecf9279319</string>
+</dict>
+</plist>

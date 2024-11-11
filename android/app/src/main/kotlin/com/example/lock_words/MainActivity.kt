@@ -1,4 +1,4 @@
-package com.example.lock_words
+package com.nodamngoodstudios.cryptext
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -21,8 +21,10 @@ import 'package:lock_words/settings/persistence/local_storage_settings_persisten
 import 'package:lock_words/settings/persistence/settings_persistence.dart';
 import 'package:lock_words/settings/settings.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
+  await dotenv.load(); // Load .env file
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await MobileAds.instance.initialize();

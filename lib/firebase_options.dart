@@ -3,7 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
@@ -43,39 +43,39 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDfbhH9reruRqW898GaFL7bA-9M6tncwuk',
-    appId: '1:530495360476:web:1da304b8c8ab0153279319',
-    messagingSenderId: '530495360476',
-    projectId: 'cryptext-7c891',
-    authDomain: 'cryptext-7c891.firebaseapp.com',
-    storageBucket: 'cryptext-7c891.appspot.com',
-    measurementId: 'G-HR6YQY2CV3',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY_WEB']!,
+    appId: dotenv.env['FIREBASE_APP_ID_WEB']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID_WEB']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID_WEB']!,
+    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN_WEB']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET_WEB']!,
+    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID_WEB']!,
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCU-CQuMwUXiWR18J50i5r83r99mIIOEKQ',
-    appId: '1:530495360476:android:47ae426952ce01cd279319',
-    messagingSenderId: '530495360476',
-    projectId: 'cryptext-7c891',
-    storageBucket: 'cryptext-7c891.appspot.com',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY_ANDROID']!,
+    appId: dotenv.env['FIREBASE_APP_ID_ANDROID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID_ANDROID']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID_ANDROID']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET_ANDROID']!,
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAukiHZjyM_RDOWP9uBUpYVmWuevvkyXLI',
-    appId: '1:530495360476:ios:e10219f616b4ecf9279319',
-    messagingSenderId: '530495360476',
-    projectId: 'cryptext-7c891',
-    storageBucket: 'cryptext-7c891.appspot.com',
-    iosBundleId: 'com.example.lockWords',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY_IOS']!,
+    appId: dotenv.env['FIREBASE_APP_ID_IOS']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID_IOS']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID_IOS']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET_IOS']!,
+    iosBundleId: dotenv.env['FIREBASE_IOS_BUNDLE_ID_IOS']!,
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAukiHZjyM_RDOWP9uBUpYVmWuevvkyXLI',
-    appId: '1:530495360476:ios:e10219f616b4ecf9279319',
-    messagingSenderId: '530495360476',
-    projectId: 'cryptext-7c891',
-    storageBucket: 'cryptext-7c891.appspot.com',
-    iosBundleId: 'com.example.lockWords',
+  static FirebaseOptions macos = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY_MACOS']!,
+    appId: dotenv.env['FIREBASE_APP_ID_MACOS']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID_MACOS']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID_MACOS']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET_MACOS']!,
+    iosBundleId: dotenv.env['FIREBASE_IOS_BUNDLE_ID_MACOS']!,
   );
 }

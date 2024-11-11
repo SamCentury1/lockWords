@@ -24,7 +24,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  await dotenv.load(); // Load .env file
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await MobileAds.instance.initialize();
@@ -42,6 +41,7 @@ void main() async {
     adsController: adsController,
   ));
 }
+
 
 class MyApp extends StatelessWidget {
   final SettingsPersistence settingsPersistence;

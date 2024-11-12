@@ -866,21 +866,19 @@ class Helpers {
     return res;
   }
 
-
   List<Widget> getCryptexWheel(GamePlayState gamePlayState) {
     List<Widget> res = [];
-    gamePlayState.wheelData.forEach((key,value) {
-      // int keyVal = int.parse(key)
-      print("i am key ${key} and I contain the following data: ${value}");
-      Widget wheel = DialWidget(index: key,);
+    
+    var sortedEntries = gamePlayState.wheelData.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    
+    for (var entry in sortedEntries) {
+      Widget wheel = DialWidget(index: entry.key);
       res.add(wheel);
-    });
+    }
 
-    print("i am result => ${res}");
     return res;
-  }  
-
-
+  }
 
   List<int> shuffleList(List<int> items) {
     

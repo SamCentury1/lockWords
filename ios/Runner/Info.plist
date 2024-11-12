@@ -15,6 +15,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg.apps.googleusercontent.com</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

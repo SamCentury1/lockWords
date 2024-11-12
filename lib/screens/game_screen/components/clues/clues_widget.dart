@@ -132,7 +132,7 @@ class _CluesWidgetState extends State<CluesWidget> {
                     itemPositionsListener: itemPositionsListener,
                     scrollOffsetListener: scrollOffsetListener,
                     itemCount: clues.length+1,
-                  
+                    physics: ClampingScrollPhysics(),
                     itemBuilder: (context,index) {
                       // late Map<dynamic,dynamic> value = {};
                       Map<String,dynamic> tappedClueData = gamePlayState.clueTappedIds;

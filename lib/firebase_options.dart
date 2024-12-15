@@ -68,7 +68,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '530495360476',
     projectId: 'cryptext-7c891',
     storageBucket: 'cryptext-7c891.appspot.com',
-    iosBundleId: 'com.example.lockWords',
+    iosBundleId: 'com.nodamngoodstudios.cryptext',
   );
 
   static FirebaseOptions macos = FirebaseOptions(
@@ -77,6 +77,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '530495360476',
     projectId: 'cryptext-7c891',
     storageBucket: 'cryptext-7c891.appspot.com',
-    iosBundleId: 'com.example.lockWords',
+    iosBundleId: 'com.nodamngoodstudios.cryptext',
   );
 }

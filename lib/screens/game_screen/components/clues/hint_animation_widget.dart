@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lock_words/functions/helpers.dart';
 import 'package:lock_words/providers/color_palette.dart';
 import 'package:lock_words/providers/game_play_state.dart';
+import 'package:lock_words/providers/settings_state.dart';
 import 'package:provider/provider.dart';
 
 class HintAnimationWidget extends StatefulWidget {
@@ -27,6 +28,9 @@ class _HintAnimationWidgetState extends State<HintAnimationWidget> {
   @override
   Widget build(BuildContext context) {
     final ColorPalette palette = Provider.of<ColorPalette>(context,listen: false);
+    late SettingsState settingsState = Provider.of<SettingsState>(context, listen:false);
+    final double sizeFactor = settingsState.screenSizeData["sizeFactor"];
+
     return Consumer<GamePlayState>(
       builder: (context,gamePlayState,child) {
         Map<dynamic,dynamic> clueData = gamePlayState.words[widget.index];
@@ -44,7 +48,7 @@ class _HintAnimationWidgetState extends State<HintAnimationWidget> {
             return Opacity(
               opacity: clueData["active"] ? 1.0 : 0.3,
               child: Padding(
-                padding: const EdgeInsets.all(6.0),
+                padding: EdgeInsets.all(6.0 * sizeFactor),
                 child: Stack(
                   children:[
                     Transform(
@@ -55,10 +59,10 @@ class _HintAnimationWidgetState extends State<HintAnimationWidget> {
                       alignment: Alignment.center,
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(8.0))
+                          borderRadius: BorderRadius.all(Radius.circular(8.0 * sizeFactor))
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(2.0,2.0,2.0,2.0),
+                          padding: EdgeInsets.all(2.0  * sizeFactor),
                           child: Container(
                             decoration: BoxDecoration(
                               // gradient: LinearGradient(
@@ -68,17 +72,17 @@ class _HintAnimationWidgetState extends State<HintAnimationWidget> {
                               //   stops: const [0.5, 0.9]
                               // ),
                               color: palette.clueCardColor.withOpacity(outVisibility),
-                              borderRadius: BorderRadius.all(Radius.circular(gamePlayState.tileSize*0.1))
+                              borderRadius: BorderRadius.all(Radius.circular(gamePlayState.tileSize*0.1 * sizeFactor))
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: EdgeInsets.all(8.0 * sizeFactor),
                               child: Row(
                                 children: [
                                   Flexible(
                                     child: Text(
                                       clueData["clue"],
                                       style: TextStyle(
-                                        fontSize: ts*0.32,
+                                        fontSize: ts*0.32 * sizeFactor,
                                         decoration: clueData["active"] ? TextDecoration.none : TextDecoration.lineThrough,
                                         // color: clueData["active"] ? Colors.black : Color.fromARGB(122, 58, 58, 58) 
                                         color:  palette.clueCardTextColor.withOpacity(outVisibility)
@@ -114,7 +118,7 @@ class _HintAnimationWidgetState extends State<HintAnimationWidget> {
                             // color: Color.fromRGBO(76, 175, 79, 0.99 * flipVisibilityAnimation.value ),
                             decoration: BoxDecoration(
                               color: palette.clueCardFlippedColor.withOpacity(inVisibility),
-                              borderRadius: BorderRadius.all(Radius.circular(gamePlayState.tileSize*0.1)),
+                              borderRadius: BorderRadius.all(Radius.circular(gamePlayState.tileSize*0.1 * sizeFactor)),
                             ),
                             child: Align(
                               alignment: Alignment.center,
@@ -122,10 +126,10 @@ class _HintAnimationWidgetState extends State<HintAnimationWidget> {
                                 hint,
                                 // "CACA",
                                 style: TextStyle(
-                                  fontSize: ts*0.32,
+                                  fontSize: ts*0.32 * sizeFactor,
                                   // color: Colors.white.withOpacity(flipVisibilityAnimation.value),
                                   color: palette.clueCardTextColor.withOpacity(inVisibility),
-                                  letterSpacing: 10.0
+                                  letterSpacing: 10.0 * sizeFactor
                                 ),
                               ),
                             ),

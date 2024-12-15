@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lock_words/providers/color_palette.dart';
+import 'package:lock_words/providers/settings_state.dart';
 import 'package:lock_words/resources/auth_service.dart';
 import 'package:lock_words/screens/auth_screen/components/auth_error_dialog.dart';
 import 'package:lock_words/screens/auth_screen/components/auth_provider_tile.dart';
@@ -86,12 +87,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     late ColorPalette palette = Provider.of<ColorPalette>(context, listen:false);
+    late SettingsState settingsState = Provider.of<SettingsState>(context, listen:false);
+    final double sizeFactor = settingsState.sizeFactor;  
+
     return Scaffold(
       backgroundColor: palette.screenBackgroundColor,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.0),
+          padding: EdgeInsets.symmetric(horizontal: 12.0 * sizeFactor),
           child: Column(
             children: [
               Expanded(
@@ -110,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Text(
                       "Welcome!",
-                      style: TextStyle(color: palette.clueCardTextColor,fontSize: 24),
+                      style: TextStyle(color: palette.clueCardTextColor,fontSize: 24 * sizeFactor),
                     ),
 
                     LoginTextField(controller: usernameController, hintText: 'Username', obscureText: false, palette: palette,),
@@ -124,24 +128,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     LoginButton(onTap: registerUser, body: "Register", palette: palette,),
                 
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25.0),
+                      padding: EdgeInsets.symmetric(horizontal: 25.0 * sizeFactor),
                       child: Row(
                         children: [
                           Expanded(
-                            child: Divider(thickness: 0.5, color: palette.clueCardTextColor),
+                            child: Divider(thickness: 0.5*sizeFactor, color: palette.clueCardTextColor),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
+                            padding: EdgeInsets.symmetric(horizontal: 10.0 * sizeFactor),
                             child: Text(
                               "or continue with",
                               style: TextStyle(
                                 color: palette.clueCardTextColor,
-                                fontSize: 16
+                                fontSize: 16*sizeFactor
                               ),
                             ),
                           ),
                           Expanded(
-                            child: Divider(thickness: 0.5, color: palette.clueCardTextColor),
+                            child: Divider(thickness: 0.5*sizeFactor, color: palette.clueCardTextColor),
                           )                      
                         ],
                       )
@@ -167,7 +171,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("already a member?", style: TextStyle(color: palette.clueCardTextColor)),
+                        Text("already a member?", 
+                          style: TextStyle(
+                            color: palette.clueCardTextColor,
+                            fontSize: 16.0 *sizeFactor,
+                          )
+                        ),
                         SizedBox(width: 5,),
                         InkWell(
                           onTap: widget.onTap,
@@ -175,7 +184,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             "login now",
                             style: TextStyle(
                               color: palette.clueCardFlippedColor,
-                              fontWeight: FontWeight.bold
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0 *sizeFactor,
                             ),
                           ),
                         )

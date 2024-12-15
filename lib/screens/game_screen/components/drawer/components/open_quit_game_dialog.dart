@@ -6,7 +6,7 @@ import 'package:lock_words/resources/firestore_methods.dart';
 import 'package:lock_words/screens/auth_screen/auth_screen.dart';
 import 'package:provider/provider.dart';
 
-Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, SettingsState settingsState) {
+Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, double sizeFactor, SettingsState settingsState) {
   return showDialog(
     context: context, 
     builder: (BuildContext context) {
@@ -16,11 +16,11 @@ Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, Sett
           return Dialog(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                borderRadius: BorderRadius.all(Radius.circular(8.0 * sizeFactor)),
                 color: palette.cryptexAreaColor
               ),
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: EdgeInsets.all(12.0 * sizeFactor),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -29,24 +29,24 @@ Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, Sett
                       "Quit Game",
                       style: TextStyle(
                         color: palette.mainTextColor,
-                        fontSize: 32,
+                        fontSize: 32 * sizeFactor,
                         fontWeight: FontWeight.w300
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: EdgeInsets.symmetric(horizontal: 5.0 * sizeFactor),
                       child: Divider(thickness: 1.0, color: palette.mainTextColor,),
                     ),              
                     Text(
                       "Are you sure you would like to quit game?",
                       style: TextStyle(
                         color: palette.mainTextColor,
-                        fontSize: 24,
+                        fontSize: 24 * sizeFactor,
                         fontWeight: FontWeight.w300
                       ),
                     ),
           
-                    SizedBox(height: 20,),
+                    SizedBox(height: 20 * sizeFactor,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -59,16 +59,21 @@ Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, Sett
                           
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                              borderRadius: BorderRadius.all(Radius.circular(8.0 * sizeFactor)),
                               color: palette.clueCardFlippedColor
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(12.0, 4.0, 12.0, 4.0),
+                              padding: EdgeInsets.fromLTRB(
+                                12.0 * sizeFactor, 
+                                4.0 * sizeFactor, 
+                                12.0 * sizeFactor, 
+                                4.0 * sizeFactor
+                              ),
                               child: Text(
                                 "Cancel",
                                 style: TextStyle(
                                   color: palette.mainTextColor,
-                                  fontSize: 22,
+                                  fontSize: 22 * sizeFactor,
                                   fontWeight: FontWeight.w300
                                 ),
                               ),
@@ -76,7 +81,7 @@ Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, Sett
                           ),
                         ), 
           
-                        SizedBox(width: 10,),
+                        SizedBox(width: 10 * sizeFactor,),
                 
                         GestureDetector(
                           onTap: () {
@@ -102,16 +107,21 @@ Future<void> openQuitGameDialog(BuildContext context, ColorPalette palette, Sett
                           },
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                              borderRadius: BorderRadius.all(Radius.circular(8.0 * sizeFactor)),
                               color: palette.clueCardColor
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(12.0, 4.0, 12.0, 4.0),
+                              padding: EdgeInsets.fromLTRB(
+                                12.0  * sizeFactor, 
+                                4.0  * sizeFactor, 
+                                12.0  * sizeFactor, 
+                                4.0 * sizeFactor
+                              ),
                               child: Text(
                                 "Yes",
                                 style: TextStyle(
                                   color: palette.mainTextColor,
-                                  fontSize: 22,
+                                  fontSize: 22 * sizeFactor,
                                   fontWeight: FontWeight.w300
                                 ),
                               ),

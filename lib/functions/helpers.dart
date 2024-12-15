@@ -12,6 +12,7 @@ import 'package:lock_words/providers/game_play_state.dart';
 import 'package:lock_words/providers/settings_state.dart';
 import 'package:lock_words/screens/game_screen/components/cryptex/dial_widget.dart';
 import 'package:lock_words/screens/game_screen/game_screen.dart';
+import 'package:lock_words/screens/tutorial_flow/tutorial_screen.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class Helpers {
@@ -253,6 +254,30 @@ class Helpers {
       }
     });
     return res;
+  }
+
+  void navigateToTutorial(String level, BuildContext context, SettingsState settingsState,GamePlayState gamePlayState) {
+    Map<dynamic,dynamic> levelData = settingsState.levelData.firstWhere((e) => e["level"] == (level));
+    int userBalance = settingsState.userData["balance"];
+    gamePlayState.setLevel(level);
+    // gamePlayState.setStartingBalance(userBalance);
+    gamePlayState.setCoins(userBalance);
+    Map<dynamic,dynamic> shuffledClues = shuffleCluesList(levelData["clues"]);
+
+    gamePlayState.setWords(shuffledClues);
+    gamePlayState.setWheelData(levelData["wheelData"]);
+    gamePlayState.setScore(0);
+    
+    final double tileSize = settingsState.screenSizeData["cryptexTileAreaWidth"]/gamePlayState.wheelData.length;
+    gamePlayState.setTileSize(tileSize);
+    // gamePlayState.setTileSize(50.0);
+
+    gamePlayState.setIsGamePaused(false);
+    gamePlayState.setIsGameOver(false);
+    gamePlayState.startTimer();    
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const TutorialScreen())
+    );    
   }
 
   void navigateToLevel(String level, BuildContext context, SettingsState settingsState,GamePlayState gamePlayState) {

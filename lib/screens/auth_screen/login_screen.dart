@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lock_words/providers/color_palette.dart';
+import 'package:lock_words/providers/settings_state.dart';
 import 'package:lock_words/resources/auth_service.dart';
 import 'package:lock_words/screens/auth_screen/auth_screen.dart';
 import 'package:lock_words/screens/auth_screen/components/auth_error_dialog.dart';
@@ -47,12 +48,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     late ColorPalette palette = Provider.of<ColorPalette>(context, listen:false);
+    late SettingsState settingsState = Provider.of<SettingsState>(context, listen:false);
+    final double sizeFactor = settingsState.sizeFactor;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: palette.screenBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.0),
+          padding: EdgeInsets.symmetric(horizontal: 12.0 * sizeFactor),
           child: Column(
             children: [
               // SizedBox(height: 50,),
@@ -75,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       "Welcome back!",
                       // style: TextStyle(color: Colors.grey[700],fontSize: 24),
-                      style: TextStyle(color: palette.mainTextColor,fontSize: 24),
+                      style: TextStyle(color: palette.mainTextColor,fontSize: 24*sizeFactor),
                     ),
                     // SizedBox(height: 15,),
                     LoginTextField(controller: emailController, hintText: 'Email', obscureText: false, palette: palette,),
@@ -87,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: Text(
                         "forgot password?",
-                        style: TextStyle(color: palette.clueCardTextColor,fontSize: 16),
+                        style: TextStyle(color: palette.clueCardTextColor,fontSize: 16 * sizeFactor),
                       ),
                     ),
                 
@@ -96,24 +99,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     // SizedBox(height: 20),
                 
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25.0),
+                      padding: EdgeInsets.symmetric(horizontal: 25.0 * sizeFactor),
                       child: Row(
                         children: [
                           Expanded(
-                            child: Divider(thickness: 0.5, color: palette.mainTextColor,),
+                            child: Divider(thickness: 0.5 * sizeFactor, color: palette.mainTextColor,),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
+                            padding: EdgeInsets.symmetric(horizontal: 10.0 * sizeFactor),
                             child: Text(
                               "or continue with",
                               style: TextStyle(
                                 color: palette.mainTextColor,
-                                fontSize: 16
+                                fontSize: 16 * sizeFactor
                               ),
                             ),
                           ),
                           Expanded(
-                            child: Divider(thickness: 0.5, color: palette.mainTextColor,),
+                            child: Divider(thickness: 0.5 * sizeFactor, color: palette.mainTextColor,),
                           )                      
                         ],
                       )
@@ -143,7 +146,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("not a member?", style: TextStyle(color: palette.clueCardTextColor)),
+                        Text("not a member?", 
+                          style: TextStyle(
+                            color: palette.clueCardTextColor,
+                            fontSize: 16.0 * sizeFactor
+                          )
+                        ),
                         SizedBox(width: 5,),
                         InkWell(
                           onTap: widget.onTap,
@@ -151,7 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             "register now",
                             style: TextStyle(
                               color: palette.clueCardFlippedColor,
-                              fontWeight: FontWeight.bold
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16 * sizeFactor
                             ),
                           ),
                         )

@@ -283,6 +283,7 @@ class GameLogic {
 
     double remaining = ((stops/10) - stopsFloor)*10;
 
+    animationState.setShouldRunCoinAnimation(false);
 
     Timer timer = Timer.periodic(Duration(milliseconds: interval.round()), (Timer t) {
       // executeCoinAnimation(gamePlayState,animationState,sign, audioController,settingsState);
@@ -295,6 +296,7 @@ class GameLogic {
         animationState.setShouldRunScoreCountAnimation(true);
         Future.delayed(Duration(milliseconds: 1000), () {
           animationState.setShouldRunScoreCountAnimation(false);
+          
           print("animation has stopped");
         });
 

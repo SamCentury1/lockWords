@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lock_words/components/painters/token_painter.dart';
 import 'package:lock_words/functions/helpers.dart';
 import 'package:lock_words/providers/ad_state.dart';
 import 'package:lock_words/providers/color_palette.dart';
@@ -107,7 +108,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   padding: EdgeInsets.symmetric(horizontal: 20.0 * sizeFactor),
                   child: Row(
                     children: [
-                      Icon(Icons.monetization_on, color: palette.mainTextColor,),
+                      // Icon(Icons.monetization_on, color: palette.mainTextColor,),
+                      SizedBox(
+                        width: 30 * sizeFactor,
+                        height: 30 * sizeFactor,
+                        child: CustomPaint(
+                          painter: TokenPainter(),
+                        ),
+                      ),                      
                       SizedBox(width: 20 * sizeFactor,),
                       Text(
                         // "14:32",
@@ -128,7 +136,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0 * sizeFactor),
                   child: GestureDetector(
-                    onTap: () => openQuitGameDialog(context,palette,settingsState),
+                    onTap: () => openQuitGameDialog(context,palette,sizeFactor,settingsState),
                     child: Container(
                       decoration: BoxDecoration(
                         color: palette.clueCardColor,
@@ -162,6 +170,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     onTap: () => openRewardDialog(
                       context,
                       palette,
+                      sizeFactor,
                       // () => _showRewardedAd(gamePlayState,adState)
                       () => adState.showRewardedAdInGame(gamePlayState)
                     ),
@@ -174,7 +183,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       child: Row(
                         children: [
                           SizedBox(width:15 * sizeFactor),
-                          Icon(Icons.monetization_on,  color: palette.mainTextColor,),
+                          // Icon(Icons.monetization_on,  color: palette.mainTextColor,),
+                          SizedBox(
+                            width: 30 * sizeFactor,
+                            height: 30 * sizeFactor,
+                            child: CustomPaint(
+                              painter: TokenPainter(),
+                            ),
+                          ),
                           SizedBox(width:15 * sizeFactor),
                           Text(
                             "Get Tokens", 

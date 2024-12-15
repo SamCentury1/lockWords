@@ -37,6 +37,7 @@ class _AuthScreenState extends State<AuthScreen> {
             return Scaffold(body: Center(child: CircularProgressIndicator()));
           } else {
             if (snapshot.hasData) {
+              
 
               return FutureBuilder(
                 future: getScreenSizeData(context,snapshot.data), 
@@ -46,14 +47,16 @@ class _AuthScreenState extends State<AuthScreen> {
                   } else if (futureSnapshot.hasError) {
                     return Scaffold(body: Center(child: Text('Error: ${futureSnapshot.error}')));
                   } else {
-
-
                     return HomeScreen(); // Only return after getScreenSizeData() completes
                   }
                 }
               );
               // return HomeScreen();
             }else {
+              print("============================================");
+              print("hm!");
+              print("============================================");
+              // setScreenSizeData(context);
               return LoginOrRegisterScreen();
             }
           } 
@@ -68,8 +71,9 @@ Future<void> getScreenSizeData(BuildContext context, User? user) async {
   SettingsController settings = context.read<SettingsController>();
   ColorPalette palette = context.read<ColorPalette>();
   
+  print("============================================");
   print("we are inside the getScreenSizeData function ==== ${user}");
-
+  print("============================================");
   /// SCREEN SIZE DATA
   final double paddingTop = MediaQuery.of(context).padding.top;
   final Size size = MediaQuery.of(context).size; // Use Size instead of dynamic for clarity
@@ -87,19 +91,10 @@ Future<void> getScreenSizeData(BuildContext context, User? user) async {
   Map<String,dynamic> userData = await getFirestoreDocument(user!.uid);
 
   List<Map<dynamic,dynamic>> levelData = await getLevelsFromFirestore();
-  // Map<dynamic,dynamic> userData = {
-  //   "username": user!.displayName ?? "Guest",
-  //   "email" : user.email ?? "",
-  //   "photoUrl": user.photoURL,
-  //   "muted": false,
-  //   "soundOn": true,
-  //   "theme": 'dark',
-  //   "cash" : 2000,
-  // };  
 
   // Set the screen size data directly
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    print(size.height);
+    
     settingsState.setScreenSizeData({
       "width": size.width, 
       "height": size.height - paddingTop,  
@@ -185,6 +180,19 @@ Future<List<Map<dynamic,dynamic>>> getLevelsFromFirestore() async {
   // return docStream.data() as Map<String, dynamic>;
 }
 
+
+// void setScreenSizeData(BuildContext context) {
+//   // Set the screen size data directly
+//   SettingsState settingsState = context.read<SettingsState>();
+  
+//   final Size size = MediaQuery.of(context).size;   
+  
+//   // WidgetsBinding.instance.addPostFrameCallback((_) {
+//     final double sizeFactor = size.height < 600 ? 0.7 : 1.0;
+//     settingsState.setSizeFactor(sizeFactor);
+
+//   // });
+// }
 
 
 

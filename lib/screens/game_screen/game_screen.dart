@@ -36,7 +36,7 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
+class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin, WidgetsBindingObserver {
 
   late double horizontalDragValue = 0.0;
   late double localPosX = 0.0;
@@ -79,7 +79,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   late Animation<double> showProgressAnimation;
   late Animation<double> hideProgressAnimation;
 
-  late AnimationController coinProgressController;
+  late AnimationController hintChargeController;
   // late Animation<double> coinProgressAnimation;
 
   late Animation<double> overlayWordGlowAnimation;
@@ -96,18 +96,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   late Map<dynamic,dynamic> coinAnimationOffsets = {};
   late Map<dynamic,dynamic> pathData = {}; 
 
+  late GamePlayState _gamePlayState;
   // RewardedAd? _rewardedAd;
   late AdState _adState;
   // late GamePlayState _gamePlayState;
 
 
 
-  
+
   // late double _screenWidth = 0.0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _gamePlayState = Provider.of<GamePlayState>(context,listen: false);
+    WidgetsBinding.instance.addObserver(this);
 
     _adState = Provider.of<AdState>(context, listen: false);
 
@@ -121,6 +124,30 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     // _createRewardedAd();
     _adState.createRewardedAd();
+  }
+
+  AppLifecycleState? _notification; 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      _notification = state;
+      
+    });
+
+    if (_notification == AppLifecycleState.paused) {
+      _gamePlayState.setIsGamePaused(true);
+    }
+
+    if (_notification == AppLifecycleState.resumed) {
+      _gamePlayState.setIsGamePaused(false);
+    }
+
+    if (_notification == AppLifecycleState.detached) {
+      print("should save game");
+    }    
+
+    print(_notification);
+
   }
 
 
@@ -235,18 +262,18 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     hideOutVisibilityAnimation  = TweenSequence<double>(hideOutVisibilitySequence).animate(hideClueController);
 
 
-    coinProgressController = AnimationController(
+    hintChargeController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );     
-    hintChargePositionAnimation =Tween<double>(begin: 0.0, end: 1.0).animate(coinProgressController);
+    hintChargePositionAnimation =Tween<double>(begin: 0.0, end: 1.0).animate(hintChargeController);
 
     List<TweenSequenceItem<double>> hintChargeVisibilitySequence = [
       TweenSequenceItem(tween: Tween(begin: 0.00, end: 1.00), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 40),
       TweenSequenceItem(tween: Tween(begin: 1.00, end: 0.00), weight: 30),
     ];     
-    hintChargeVisibilityAnimation = TweenSequence<double>(hintChargeVisibilitySequence).animate(coinProgressController);
+    hintChargeVisibilityAnimation = TweenSequence<double>(hintChargeVisibilitySequence).animate(hintChargeController);
   }
 
   void handleAnimationStateChanges() {
@@ -267,6 +294,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
 
     if (animationState.shouldRunCoinAnimation) {
+      print("execute hint charge animation");
       executeCoinAnimation();
 
     }
@@ -297,9 +325,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void executeCoinAnimation() {
-    coinProgressController.reset();
-    coinProgressController.forward();
+    hintChargeController.reset();
+    hintChargeController.forward();
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -373,7 +407,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 ),
 
                 AnimatedBuilder(
-                  animation: coinProgressController,
+                  animation: hintChargeController,
                   builder: (context, child) {
                     late double itemWidth = 40;
                     late double itemHeight = 40;

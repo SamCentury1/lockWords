@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lock_words/functions/helpers.dart';
 import 'package:lock_words/providers/color_palette.dart';
+import 'package:lock_words/providers/game_play_state.dart';
 import 'package:lock_words/providers/settings_state.dart';
 import 'package:lock_words/resources/auth_service.dart';
 import 'package:lock_words/screens/auth_screen/auth_screen.dart';
 import 'package:lock_words/screens/profile_screen/profile_screen.dart';
 import 'package:lock_words/screens/settings_screen/settings_screen.dart';
+import 'package:lock_words/screens/tutorial_flow/tutorial_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -16,6 +18,7 @@ class HomeDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     late ColorPalette palette = Provider.of<ColorPalette>(context, listen: false);
     late SettingsState settingsState = Provider.of<SettingsState>(context, listen: false);
+    late GamePlayState gamePlayState = Provider.of<GamePlayState>(context, listen: false);
     final double sizeFactor = settingsState.screenSizeData["sizeFactor"];
     
     return Drawer(
@@ -74,7 +77,7 @@ class HomeDrawer extends StatelessWidget {
               ),
             ),
             onTap: () {
-              print("caca");
+              Helpers().navigateToTutorial("Tutorial", context, settingsState, gamePlayState);
 
             },
           ),

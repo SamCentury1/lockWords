@@ -33,24 +33,8 @@ class _ClueWidgetState extends State<ClueWidget> with TickerProviderStateMixin{
   late Animation<Color?> colorAnimation;
   late int randomIndex = 0;
 
-  // late AnimationController flipController;
-  // late Animation<double> flipAngleAnimation;
-
-  // late AnimationController flipVisibilityController;
-  // late Animation<double> flipVisibilityAnimation;
-
-  // late AnimationState _animationState;
-  // late GamePlayState _gamePlayState;
-
   late String hint = "";
 
-  // final Map<dynamic,dynamic> colors = {
-  //   0: [Color.fromRGBO(128, 128, 128, 1),Color.fromRGBO(129, 129, 129, 1),],
-  //   1: [Color.fromRGBO(99, 99, 99, 1),Color.fromRGBO(151, 151, 151, 1),],
-  //   2: [Color.fromRGBO(88, 88, 88, 1),Color.fromRGBO(105, 105, 105, 1),],
-  //   3: [Color.fromRGBO(121, 121, 121, 1),Color.fromRGBO(109, 109, 109, 1),],
-  //   4: [Color.fromRGBO(68, 68, 68, 1),Color.fromRGBO(75, 75, 75, 1),],
-  // };
 
   late bool clueSide = true;
 
@@ -59,90 +43,7 @@ class _ClueWidgetState extends State<ClueWidget> with TickerProviderStateMixin{
   void initState() {
     // TODO: implement initState
     super.initState();
-    Random rand = Random();
-    randomIndex = rand.nextInt(5);
-    // _animationState = Provider.of<AnimationState>(context, listen: false);
-    // _gamePlayState = Provider.of<GamePlayState>(context, listen: false);
-    // _animationState.addListener(handleAnimationStateChanges);
-    // _gamePlayState.addListener(handleAnimationStateChanges);
-    // initializeAnimations();
   }
-
-  // void initializeAnimations() {
-  //     flipController = AnimationController(
-  //       duration: const Duration(milliseconds: 5000),
-  //       vsync: this,
-  //     );
-
-  //     List<TweenSequenceItem<double>> flipAnimationSequence = [
-  //       TweenSequenceItem(tween: Tween(begin: 0.00, end: 180), weight: 10),
-  //     ];      
-
-  //     flipAngleAnimation  = TweenSequence<double>(flipAnimationSequence).animate(flipController);  
-
-  //     List<TweenSequenceItem<double>> flipVisibilityAnimationSequence = [
-  //       TweenSequenceItem(tween: Tween(begin: 0.00, end: 0.00), weight: 50),
-  //       TweenSequenceItem(tween: Tween(begin: 1.00, end: 1.00), weight: 50),
-  //     ];      
-
-  //     flipVisibilityAnimation  = TweenSequence<double>(flipVisibilityAnimationSequence).animate(flipController);               
-  // }
-
-  // void initializeAnimations() {
-  //   Color color_0 = Colors.blue;
-  //   Color color_1 = Colors.pink;
-
-  //   colorAnimation = ColorTween(begin:color_0,end: color_1).animate(widget.animationController);    
-  // }
-
-  // void handleAnimationStateChanges() {
-
-  //   Map<String,dynamic> animatedClues = _animationState.clueTappedIds;
-  //   if (_animationState.shouldRunShowHintAnimation) {
-
-  //     // Map<String,dynamic> clue = _gamePlayState.words[widget.index];
-
-  //     if (animatedClues["current"] == widget.index) {
-  //       print("executing the show for clue id ${widget.index}");
-  //       executeShowHintAnimation();
-  //     }
-  //     // if (!clue["hintOpen"]) {
-
-  //     // }
-  //     // executeShowHintAnimation();
-  //     // executeAnimations(clue["hintOpen"]);
-
-      
-  //   }
-
-  //   if (_animationState.shouldRunHideHintAnimation) {
-
-  //     if (animatedClues["previous"] == widget.index) {
-  //       print("executing the hide for clue id ${widget.index}");
-  //       executeHideHintAnimation();
-  //     }
-  //   }
-  // }
-
-  // void executeShowHintAnimation() {
-  //   flipController.reset();
-  //   flipController.forward();    
-  // }
-
-  // void executeHideHintAnimation() {
-  //   flipController.reverse();
-  // }  
-  // void executeAnimations(bool isOpen) {
-  //   if (!isOpen) {
-  //     flipController.reverse();
-  //     flipVisibilityController.reverse();      
-  //   } else {
-  //     flipController.reset();
-  //     flipController.forward();
-  //     flipVisibilityController.reset();
-  //     flipVisibilityController.forward();      
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -176,10 +77,6 @@ class _ClueWidgetState extends State<ClueWidget> with TickerProviderStateMixin{
                   gamePlayState.setClueTappedPosition(null);
                 },
 
-                // onTapUp: (TapUpDetails details) {
-                //   gamePlayState.setClueTappedPosition(null);
-                // } ,
-
                 onTap: () {
                   if (gamePlayState.coins > 3) {
                     Helpers().getClueTappedId(gamePlayState,animationState,widget.index, audioController,settingsState);
@@ -204,12 +101,6 @@ class _ClueWidgetState extends State<ClueWidget> with TickerProviderStateMixin{
                       padding: const EdgeInsets.fromLTRB(2.0,2.0,2.0,2.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          // gradient: LinearGradient(
-                          //   begin: Alignment.bottomRight,
-                          //   end: Alignment.topRight,
-                          //   colors: colors[randomIndex],
-                          //   stops: const [0.5, 0.9]
-                          // ),
                           color: palette.clueCardColor, //  Color.fromARGB(255, 68, 51, 116),
                           borderRadius: BorderRadius.all(Radius.circular(8.0))
                         ),
@@ -223,7 +114,6 @@ class _ClueWidgetState extends State<ClueWidget> with TickerProviderStateMixin{
                                   style: TextStyle(
                                     fontSize: ts*0.32,
                                     decoration: clueData["active"] ? TextDecoration.none : TextDecoration.lineThrough,
-                                    // color: clueData["active"] ? Colors.black : Color.fromARGB(122, 58, 58, 58) 
                                     color: palette.clueCardTextColor //const Color.fromARGB(255, 187, 182, 182)
                                   ),
                                 ),
@@ -249,13 +139,6 @@ class _ClueWidgetState extends State<ClueWidget> with TickerProviderStateMixin{
                           padding: const EdgeInsets.fromLTRB(2.0,2.0,2.0,2.0),
                           child: Container(
                             decoration: BoxDecoration(
-                              // gradient: LinearGradient(
-                              //   begin: Alignment.bottomRight,
-                              //   end: Alignment.topRight,
-                              //   colors: colors[randomIndex],
-                              //   stops: const [0.5, 0.9]
-                              // ),
-                              // color: Colors.brown,
                               borderRadius: BorderRadius.all(Radius.circular(8.0))
                             ),
                             child: Padding(

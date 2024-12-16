@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:lock_words/ads/ads_controller.dart';
 import 'package:lock_words/app_lifecycle/app_lifecycle.dart';
@@ -25,6 +26,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await MobileAds.instance.initialize();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -43,7 +46,7 @@ void main() async {
 }
 
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final SettingsPersistence settingsPersistence;
   final AdsController? adsController;
   const MyApp({
@@ -51,6 +54,26 @@ class MyApp extends StatelessWidget {
     required this.settingsPersistence,
     required this.adsController,
   });
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initializeSplashScreen();
+  }
+
+  void initializeSplashScreen() async {
+    print("pausing ...");
+    await Future.delayed(const Duration(seconds: 3));
+    print("unpausing ...");
+    FlutterNativeSplash.remove();
+  }
 
 
   @override
@@ -63,11 +86,11 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => AnimationState()),
           ChangeNotifierProvider(create: (_) => ColorPalette(),),
           ChangeNotifierProvider(create: (_) => AdState(),),
-          Provider<AdsController?>.value(value: adsController),
+          Provider<AdsController?>.value(value: widget.adsController),
           Provider<SettingsController>(
             lazy: false,
             create: (context) => SettingsController(
-              persistence: settingsPersistence,
+              persistence: widget.settingsPersistence,
             )..loadStateFromPerisitence(),
           ),
           ProxyProvider2<SettingsController, ValueNotifier<AppLifecycleState>,AudioController>(

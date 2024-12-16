@@ -136,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         AuthProviderTile(
                           palette: palette, 
-                          onTap: () => print('caca butt'),
+                          onTap: () => AuthService().signInWithApple(), 
                           iconData: Icons.apple,
                         ),                        
                                    

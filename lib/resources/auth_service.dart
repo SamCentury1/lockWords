@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lock_words/screens/auth_screen/components/auth_error_dialog.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -53,6 +54,48 @@ class AuthService {
     }    
   }
 
+  Future<UserCredential?> signInWithApple() async {
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ]
+      );
+      final oAuthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      UserCredential cred =  await _firebaseAuth.signInWithCredential(oAuthCredential);
+      late String os = "iOS";
+
+      if (cred.additionalUserInfo!.isNewUser) {
+        await _firestore.collection("users").doc(cred.user!.uid).set({
+          "uid": cred.user!.uid,
+          "username": cred.user!.displayName,
+          "email": cred.user!.email,
+          "photoUrl": cred.user!.photoURL,
+          "parameters" : {
+            "muted": false,
+            "soundOn": true,
+            "theme": 'dark',
+          },
+          "createdAt": DateTime.now().toIso8601String(),
+          "providerData": "google",
+          "os": os,
+          "balance": 5
+        });        
+      }
+
+      return cred;
+
+    }catch (e) {
+      print("Error with Sign in with Apple => $e ");
+      return null;
+    }
+  }
+ 
 
   Future<UserCredential> signInWithGoogle() async {
     final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
@@ -92,6 +135,11 @@ class AuthService {
     }
 
     return cred;
+  }
+
+
+  void addUserToDatabase(UserCredential cred) {
+
   }
 
 

@@ -69,20 +69,23 @@ class AuthService {
 
       UserCredential cred =  await _firebaseAuth.signInWithCredential(oAuthCredential);
       late String os = "iOS";
+      String username = cred.user!.displayName ?? appleCredential.givenName ?? "User";
+      String email = cred.user!.email ?? appleCredential.email ?? "unknown@apple.com";    
+      String photoURL = cred.user!.photoURL ?? ""; 
 
       if (cred.additionalUserInfo!.isNewUser) {
         await _firestore.collection("users").doc(cred.user!.uid).set({
           "uid": cred.user!.uid,
-          "username": cred.user!.displayName,
-          "email": cred.user!.email,
-          "photoUrl": cred.user!.photoURL,
+          "username": username,
+          "email": email,
+          "photoUrl": photoURL,
           "parameters" : {
             "muted": false,
             "soundOn": true,
             "theme": 'dark',
           },
           "createdAt": DateTime.now().toIso8601String(),
-          "providerData": "google",
+          "providerData": "apple",
           "os": os,
           "balance": 5
         });        

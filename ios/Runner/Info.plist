@@ -11,12 +11,14 @@
 				<array>
 					<!-- TODO Replace this value: -->
 					<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
-					<string>com.googleusercontent.apps.530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg</string>
+					<!-- <string>com.googleusercontent.apps.530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg</string> -->
+					<string>com.googleusercontent.apps.530495360476-b68bal9ukh59m0easmn4oca0cvrv6a4f</string>
 				</array>
 			</dict>
 		</array>
 		<key>GIDClientID</key>
-		<string>530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg.apps.googleusercontent.com</string>
+		<!-- <string>530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg.apps.googleusercontent.com</string> -->
+		<string>530495360476-b68bal9ukh59m0easmn4oca0cvrv6a4f.apps.googleusercontent.com</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

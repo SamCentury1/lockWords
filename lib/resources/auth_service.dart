@@ -104,6 +104,10 @@ class AuthService {
         accessToken: appleCredential.authorizationCode,
       );
 
+      print("apple cred: $appleCredential");
+
+      print("oauth cred: $oAuthCredential");
+
       UserCredential cred =  await _firebaseAuth.signInWithCredential(oAuthCredential);
       late String os = "iOS";
       String username = cred.user!.displayName ?? appleCredential.givenName ?? "User";

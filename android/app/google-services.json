@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "530495360476-992q4efik5dbc0mj5qp10ppvc2f5pgt8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nodamngoodstudios.cryptext",
+            "certificate_hash": "d132101b42339b519fe974a0dc0b1fbb47e0b2b4"
+          }
+        },
+        {
           "client_id": "530495360476-7ph53r6ic6n2na9m3f7j2u1mrgthnltm.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -34,7 +42,7 @@
               "client_id": "530495360476-61rvlhjnfblce9p49p735ih71gj8nsbg.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.nodamngoodstudios.cryptext"
+                "bundle_id": "com.example.lockWords"
               }
             }
           ]

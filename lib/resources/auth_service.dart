@@ -24,6 +24,25 @@ class AuthService {
     });
   }
 
+  
+  Map<String,dynamic> generateUserDocument(String uid, String? username, String? email, String? photoUrl, String provider, String os) {
+    return {
+        "uid": uid,
+        "username": username,
+        "email": email,
+        "photoUrl": null,
+        "parameters" : {
+          "muted": false,
+          "soundOn": true,
+          "theme": 'dark',
+        },
+        "createdAt": DateTime.now().toIso8601String(),
+        "providerData": "none",
+        "os": os,
+        "balance": 5      
+    };
+  }
+
   Future<void> registerUserManually(String email, String password, String username) async {
     UserCredential cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email, 
@@ -36,23 +55,41 @@ class AuthService {
       os = 'iOS';
     }    
     if (cred.additionalUserInfo!.isNewUser) {
-      await _firestore.collection("users").doc(cred.user!.uid).set({
-        "uid": cred.user!.uid,
-        "username": username,
-        "email": email,
-        "photoUrl": null,
-        "parameters" : {
-          "muted": false,
-          "soundOn": true,
-          "theme": 'dark',
-        },
-        "createdAt": DateTime.now().toIso8601String(),
-        "providerData": "none",
-        "os": os,
-        "balance": 5
-      });        
+      final Map<String,dynamic> userDocument = generateUserDocument(cred.user!.uid,username,email,null,"none",os);
+      await _firestore.collection("users").doc(cred.user!.uid).set(userDocument);
+      // await _firestore.collection("users").doc(cred.user!.uid).set({
+      //   "uid": cred.user!.uid,
+      //   "username": username,
+      //   "email": email,
+      //   "photoUrl": null,
+      //   "parameters" : {
+      //     "muted": false,
+      //     "soundOn": true,
+      //     "theme": 'dark',
+      //   },
+      //   "createdAt": DateTime.now().toIso8601String(),
+      //   "providerData": "none",
+      //   "os": os,
+      //   "balance": 5
+      // });        
     }    
   }
+
+
+  // Future<UserCredential> signInWithApple2() async {
+  //   final appleProvider = AppleAuthProvider();
+  //   var auth = await _firebaseAuth.signInWithProvider(appleProvider);
+
+  //   if (auth.user! == null) {
+  //     String? displayName = "apple_user";
+  //     String? email = "apple@email.com";
+  //     String? id = auth.user?.uid;
+  //     String? photoUrl = auth.user?.photoURL??"";
+  //     UserLoginResponseEntity userProfile = UserLoginResponseEntity();
+  //   }
+
+
+  // }
 
   Future<UserCredential?> signInWithApple() async {
     try {
@@ -74,21 +111,23 @@ class AuthService {
       String photoURL = cred.user!.photoURL ?? ""; 
 
       if (cred.additionalUserInfo!.isNewUser) {
-        await _firestore.collection("users").doc(cred.user!.uid).set({
-          "uid": cred.user!.uid,
-          "username": username,
-          "email": email,
-          "photoUrl": photoURL,
-          "parameters" : {
-            "muted": false,
-            "soundOn": true,
-            "theme": 'dark',
-          },
-          "createdAt": DateTime.now().toIso8601String(),
-          "providerData": "apple",
-          "os": os,
-          "balance": 5
-        });        
+        final Map<String,dynamic> userDocument = generateUserDocument(cred.user!.uid,username,email,photoURL,"apple",os);
+        await _firestore.collection("users").doc(cred.user!.uid).set(userDocument);
+        // await _firestore.collection("users").doc(cred.user!.uid).set({
+        //   "uid": cred.user!.uid,
+        //   "username": username,
+        //   "email": email,
+        //   "photoUrl": photoURL,
+        //   "parameters" : {
+        //     "muted": false,
+        //     "soundOn": true,
+        //     "theme": 'dark',
+        //   },
+        //   "createdAt": DateTime.now().toIso8601String(),
+        //   "providerData": "apple",
+        //   "os": os,
+        //   "balance": 5
+        // });        
       }
 
       return cred;
@@ -120,21 +159,23 @@ class AuthService {
     }
 
     if (cred.additionalUserInfo!.isNewUser) {
-      await _firestore.collection("users").doc(cred.user!.uid).set({
-        "uid": cred.user!.uid,
-        "username": cred.user!.displayName,
-        "email": cred.user!.email,
-        "photoUrl": cred.user!.photoURL,
-        "parameters" : {
-          "muted": false,
-          "soundOn": true,
-          "theme": 'dark',
-        },
-        "createdAt": DateTime.now().toIso8601String(),
-        "providerData": "google",
-        "os": os,
-        "balance": 5
-      });        
+      final Map<String,dynamic> userDocument = generateUserDocument(cred.user!.uid,cred.user!.displayName,cred.user!.email,cred.user!.photoURL,"google",os);
+      await _firestore.collection("users").doc(cred.user!.uid).set(userDocument);
+      // await _firestore.collection("users").doc(cred.user!.uid).set({
+      //   "uid": cred.user!.uid,
+      //   "username": cred.user!.displayName,
+      //   "email": cred.user!.email,
+      //   "photoUrl": cred.user!.photoURL,
+      //   "parameters" : {
+      //     "muted": false,
+      //     "soundOn": true,
+      //     "theme": 'dark',
+      //   },
+      //   "createdAt": DateTime.now().toIso8601String(),
+      //   "providerData": "google",
+      //   "os": os,
+      //   "balance": 5
+      // });        
     }
 
     return cred;

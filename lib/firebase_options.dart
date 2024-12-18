@@ -3,7 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
@@ -43,18 +43,17 @@ class DefaultFirebaseOptions {
     }
   }
 
-
-  static FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDfbhH9reruRqW898GaFL7bA-9M6tncwuk',
-    appId: '1:530495360476:web:1da304b8c8ab0153279319',
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyB3NCO4B0_p5eaV7FVsln8QGRtJN61yAsc',
+    appId: '1:530495360476:web:eb589f86a651a504279319',
     messagingSenderId: '530495360476',
     projectId: 'cryptext-7c891',
     authDomain: 'cryptext-7c891.firebaseapp.com',
     storageBucket: 'cryptext-7c891.appspot.com',
-    measurementId: 'G-HR6YQY2CV3',
+    measurementId: 'G-92XVVM82Y2',
   );
 
-  static FirebaseOptions android = FirebaseOptions(
+  static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCU-CQuMwUXiWR18J50i5r83r99mIIOEKQ',
     appId: '1:530495360476:android:47ae426952ce01cd279319',
     messagingSenderId: '530495360476',
@@ -62,21 +61,25 @@ class DefaultFirebaseOptions {
     storageBucket: 'cryptext-7c891.appspot.com',
   );
 
-  static FirebaseOptions ios = FirebaseOptions(
+  static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAukiHZjyM_RDOWP9uBUpYVmWuevvkyXLI',
-    appId: '1:530495360476:ios:e10219f616b4ecf9279319',
+    appId: '1:530495360476:ios:b36a85b46714b3eb279319',
     messagingSenderId: '530495360476',
     projectId: 'cryptext-7c891',
     storageBucket: 'cryptext-7c891.appspot.com',
+    androidClientId: '530495360476-992q4efik5dbc0mj5qp10ppvc2f5pgt8.apps.googleusercontent.com',
+    iosClientId: '530495360476-b68bal9ukh59m0easmn4oca0cvrv6a4f.apps.googleusercontent.com',
     iosBundleId: 'com.nodamngoodstudios.cryptext',
   );
 
-  static FirebaseOptions macos = FirebaseOptions(
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAukiHZjyM_RDOWP9uBUpYVmWuevvkyXLI',
-    appId: '1:530495360476:ios:e10219f616b4ecf9279319',
+    appId: '1:530495360476:ios:b36a85b46714b3eb279319',
     messagingSenderId: '530495360476',
     projectId: 'cryptext-7c891',
     storageBucket: 'cryptext-7c891.appspot.com',
+    androidClientId: '530495360476-992q4efik5dbc0mj5qp10ppvc2f5pgt8.apps.googleusercontent.com',
+    iosClientId: '530495360476-b68bal9ukh59m0easmn4oca0cvrv6a4f.apps.googleusercontent.com',
     iosBundleId: 'com.nodamngoodstudios.cryptext',
   );
 }
